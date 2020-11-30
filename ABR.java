@@ -150,14 +150,14 @@ public class ABR<E> extends AbstractCollection<E> {
 		return res;
 		/*Noeud x = racine;
 
-        while (x != null && x.cle != (E)o) {
-            if (cmp.compare(x.cle, (E)o) > 0) {
-                x = x.gauche;
-            } else {
-                x = x.droit;
-            }
-        }
-        return x;
+		while (x != null && x.cle != (E)o) {
+			if (cmp.compare(x.cle, (E)o) > 0) {
+				x = x.gauche;
+			} else {
+				x = x.droit;
+			}
+		}
+		return x;
         }*/
 	}
 
