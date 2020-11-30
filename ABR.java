@@ -44,7 +44,7 @@ public class ABR<E> extends AbstractCollection<E> {
 		 *         dans ce noeud
 		 */
 		Noeud minimum() {
-			Noeud n;
+			Noeud n = new Noeud(cle);
 			while (n.gauche != null) {
 				n = n.gauche;
 			}
@@ -59,7 +59,7 @@ public class ABR<E> extends AbstractCollection<E> {
 		 *         grande clé
 		 */
 		Noeud suivant() {
-			Noeud n;
+			Noeud n = new Noeud(cle);
 			if(n.droit != null) {
 				return minimum();
 			}
@@ -140,16 +140,7 @@ public class ABR<E> extends AbstractCollection<E> {
 	 * @return le noeud qui contient la clé ou null si la clé n'est pas trouvée.
 	 */
 	private Noeud rechercher(Object o) {
-		Noeud x = racine;
-		while (x != null && x.cle != o) {
-			x = o;
-			if(x < x.cle) {
-				x = x.gauche;
-			} else {
-				x = x.droit;
-			}
-		}
-		return x;
+		return null;
 	}
 
 	/**
@@ -163,10 +154,12 @@ public class ABR<E> extends AbstractCollection<E> {
 	 *         {@link Iterator#remove()}
 	 */
 	private Noeud supprimer(Noeud z) {
-		/*if (z.gauche == null || z.droit == null)
+		Noeud y = new Noeud(null);
+		Noeud x = new Noeud(null);
+		if (z.gauche == null || z.droit == null)
     		y = z;
   		else
-    		y = successeur(z);				//a faire
+    		y = z.suivant();				//a faire
   		// y est le nœud à détacher
 
   		if (y.gauche != null)
@@ -183,14 +176,13 @@ public class ABR<E> extends AbstractCollection<E> {
     		if (y == y.pere.gauche)
       			y.pere.gauche = x;
     		else
-      			y.pere.droite = x;
+      			y.pere.droit = x;
   		}
 
   		/*if (y != z) z.cle = y.cle;
-  			y = null;*//*
+  			y = null;*/
 
-		return y;*/
-		return null;
+		return y;
 	}
 
 	/**
