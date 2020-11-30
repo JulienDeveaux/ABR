@@ -140,7 +140,16 @@ public class ABR<E> extends AbstractCollection<E> {
 	 * @return le noeud qui contient la clé ou null si la clé n'est pas trouvée.
 	 */
 	private Noeud rechercher(Object o) {
-		return null;
+		Noeud x = racine;
+
+		while (x != null && x.cle != (E)o) {
+			if (cmp.compare(x.cle, (E)o) > 0) {
+				x = x.gauche;
+			} else {
+				x = x.droit;
+			}
+		}
+		return x;
 	}
 
 	/**
