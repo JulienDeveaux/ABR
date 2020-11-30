@@ -140,7 +140,25 @@ public class ABR<E> extends AbstractCollection<E> {
 	 * @return le noeud qui contient la clé ou null si la clé n'est pas trouvée.
 	 */
 	private Noeud rechercher(Object o) {
-		return null;
+		Noeud res = racine;
+
+		while(!res.cle.equals((E)o)) {
+			if(cmp.compare(res.cle, (E)o) < 0) res = res.droit;
+			if(cmp.compare(res.cle, (E)o) > 0) res = res.gauche;
+		}
+
+		return res;
+		/*Noeud x = racine;
+
+        while (x != null && x.cle != (E)o) {
+            if (cmp.compare(x.cle, (E)o) > 0) {
+                x = x.gauche;
+            } else {
+                x = x.droit;
+            }
+        }
+        return x;
+        }*/
 	}
 
 	/**
@@ -192,7 +210,11 @@ public class ABR<E> extends AbstractCollection<E> {
 	 */
 	private class ABRIterator implements Iterator<E> {
 		public boolean hasNext() {
-			// TODO
+			/*if(this.suivant() != null) {
+				return true;
+			} else {
+				return false;
+			}*/
 			return false;
 		}
 
