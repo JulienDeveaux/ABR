@@ -1,7 +1,4 @@
-import java.util.AbstractCollection;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * <p>
@@ -44,7 +41,7 @@ public class ABR<E> extends AbstractCollection<E> {
 		 *         dans ce noeud
 		 */
 		Noeud minimum() {
-			Noeud n = new Noeud(cle);
+			Noeud n = this;
 			while (n.gauche != null) {
 				n = n.gauche;
 			}
@@ -59,7 +56,7 @@ public class ABR<E> extends AbstractCollection<E> {
 		 *         grande clé
 		 */
 		Noeud suivant() {
-			Noeud n = new Noeud(cle);
+			Noeud n = this;
 			if(n.droit != null) {
 				return minimum();
 			}
@@ -69,6 +66,19 @@ public class ABR<E> extends AbstractCollection<E> {
 				o = o.pere;
 			}
 			return o;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			Noeud noeud = (Noeud) o;
+			return cle.equals(noeud.cle);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(cle);
 		}
 	}
 
@@ -129,6 +139,13 @@ public class ABR<E> extends AbstractCollection<E> {
 		return taille;
 	}
 
+	@Override
+	public boolean remove(Object o)
+	{
+		return this.supprimer( this.rechercher((E)o)) != null;
+	}
+
+
 	// Quelques méthodes utiles
 
 	/**
@@ -139,7 +156,7 @@ public class ABR<E> extends AbstractCollection<E> {
 	 *            la clé à chercher
 	 * @return le noeud qui contient la clé ou null si la clé n'est pas trouvée.
 	 */
-	private Noeud rechercher(Object o) {
+	public Noeud rechercher(Object o) {
 		Noeud x = racine;
 
 		while (x != null && x.cle != (E)o) {
@@ -163,35 +180,104 @@ public class ABR<E> extends AbstractCollection<E> {
 	 *         {@link Iterator#remove()}
 	 */
 	private Noeud supprimer(Noeud z) {
-		Noeud y = new Noeud(null);
-		Noeud x = new Noeud(null);
-		if (z.gauche == null || z.droit == null)
+		Noeud y;
+		Noeud x;
+		if (z.gauche == null || z.droit == null){
+			System.out.println("jfaim");
     		y = z;
-  		else
-    		y = z.suivant();				//a faire
+		}
+  		else{
+			System.out.println("chocolat");
+			y = z.suivant();
+		}
   		// y est le nœud à détacher
 
-  		if (y.gauche != null)
-    		x = y.gauche;
-  		else
-    		x = y.droit;
+		if(y == null){
+			System.out.println("prune");
+			return null;
+		}
+
+  		if (y.gauche != null) {
+			System.out.println("banane");
+			x = y.gauche;
+		}
+  		else {
+			System.out.println("tartiflette");
+			x = y.droit;
+		}
   		// x est le fils unique de y ou null si y n'a pas de fils
 
-  		if (x != null) x.pere = y.pere;
-
-  		if (y.pere == null) { // suppression de la racine
-    		racine = x;
-  		} else {
-    		if (y == y.pere.gauche)
-      			y.pere.gauche = x;
-    		else
-      			y.pere.droit = x;
+  		if (x != null) {
+			System.out.println("pain");
+  			x.pere = y.pere;
   		}
 
-  		/*if (y != z) z.cle = y.cle;
-  			y = null;*/
+  		if (y.pere == null) { // suppression de la racine
+			System.out.println("baguette");
+  			racine = x;
+  		} else {
+			System.out.println("jambon beurre");
+    		if (y.equals(y.pere)) {
+				System.out.println("petit pois lardon");
+				y.pere.gauche = x;
+			}
+    		else {
+				System.out.println("coquillette");
+				y.pere.droit = x;
+			}
+  		}
 
-		return y;
+  		if (!y.equals(z)) {
+			System.out.println("brioche");
+  			z.cle = y.cle;
+		}
+		System.out.println("saucisson");
+  			y = null;
+		taille--;
+		return z.suivant();
+	}
+
+
+	@Override
+	public boolean add(E e)
+	{
+		if( e == null ) return false;
+
+		Noeud z = new Noeud(e);
+		Noeud y = null;
+		Noeud x = racine;
+
+		while (x != null)
+		{
+			y = x;
+			x = this.cmp.compare(z.cle, x.cle) < 0 ? x.gauche : x.droit;
+		}
+
+		z.pere = y;
+
+		if( y == null )
+		{
+			racine = z;
+		}
+		else
+		{
+			if( this.cmp.compare(z.cle, y.cle) < 0) y.gauche = z;
+			else                                    y.droit  = z;
+		}
+
+		z.gauche = z.droit = null;
+		taille++;
+		return true;
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends E> c)
+	{
+		for( E e : c )
+			if( !this.add(e) )
+				return false;
+
+		return true;
 	}
 
 	/**
@@ -200,18 +286,29 @@ public class ABR<E> extends AbstractCollection<E> {
 	 * {@link Noeud#suivant()}
 	 */
 	private class ABRIterator implements Iterator<E> {
+		Noeud courant;
+
+		 ABRIterator(){
+			Noeud courant = racine;
+		}
+
 		public boolean hasNext() {
-			// TODO
-			return false;
+		return courant != null;
 		}
 
 		public E next() {
-			// TODO
-			return null;
+		 	E tmp;
+		 	if (courant == null){
+		 		return null;
+			}
+		 	tmp = courant.cle;
+			this.courant.suivant();
+
+			return tmp;
 		}
 
 		public void remove() {
-			// TODO
+		this.courant = ABR.this.supprimer(courant);
 		}
 	}
 
