@@ -1,7 +1,4 @@
-import java.util.AbstractCollection;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * <p>
@@ -31,8 +28,8 @@ public class ABR<E> extends AbstractCollection<E> {
 
 		Noeud(E cle) {
 			this.cle = cle;
-			this.droit = droit;
-			this.gauche = gauche;
+			this.droit = null;
+			this.gauche = null;
 			this.pere = null;
 		}
 
@@ -44,11 +41,11 @@ public class ABR<E> extends AbstractCollection<E> {
 		 *         dans ce noeud
 		 */
 		Noeud minimum() {
-			Noeud n = this;
-			while (n.gauche != null) {
-				n = n.gauche;
+			Noeud x = this;
+			while (x.gauche != null) {
+				x = x.gauche;
 			}
-			return n;
+			return x;
 		}
 
 		/**
@@ -59,16 +56,16 @@ public class ABR<E> extends AbstractCollection<E> {
 		 *         grande clé
 		 */
 		Noeud suivant() {
-			Noeud n = this;
-			if(n.droit != null) {
-				return minimum();
+			Noeud x = this;
+			if(x.droit != null) {
+				return x.droit.minimum();
 			}
-			Noeud o = n.pere;
-			while(o != null && n == o.droit) {
-				n = o;
-				o = o.pere;
+			Noeud y = x.pere;
+			while(y != null && x == y.droit) {
+				x = y;
+				y = y.pere;
 			}
-			return o;
+			return y;
 		}
 
 		@Override
@@ -81,7 +78,7 @@ public class ABR<E> extends AbstractCollection<E> {
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(cle);
+		return Objects.hash(cle);
 		}
 	}
 
@@ -186,57 +183,44 @@ public class ABR<E> extends AbstractCollection<E> {
 		Noeud y;
 		Noeud x;
 		if (z.gauche == null || z.droit == null){
-			System.out.println("jfaim");
     		y = z;
 		}
   		else{
-			System.out.println("chocolat");
 			y = z.suivant();
 		}
   		// y est le nœud à détacher
 
 		if(y == null){
-			System.out.println("prune");
 			return null;
 		}
 
   		if (y.gauche != null) {
-			System.out.println("banane");
 			x = y.gauche;
 		}
   		else {
-			System.out.println("tartiflette");
 			x = y.droit;
 		}
   		// x est le fils unique de y ou null si y n'a pas de fils
 
   		if (x != null) {
-			System.out.println("pain");
   			x.pere = y.pere;
   		}
 
   		if (y.pere == null) { // suppression de la racine
-			System.out.println("baguette");
-  			racine = x;
+  			this.racine = x;
   		} else {
-			System.out.println("jambon beurre");
-    		if (y.equals(y.pere)) {
-				System.out.println("petit pois lardon");
+    		if (y.equals(y.pere.gauche)) {
 				y.pere.gauche = x;
 			}
     		else {
-				System.out.println("coquillette");
 				y.pere.droit = x;
 			}
   		}
 
   		if (!y.equals(z)) {
-			System.out.println("brioche");
   			z.cle = y.cle;
 		}
-		System.out.println("saucisson");
-  			y = null;
-		taille--;
+		this.taille--;
 		return z.suivant();
 	}
 
@@ -338,6 +322,7 @@ public class ABR<E> extends AbstractCollection<E> {
 				c = '|';
 			buf.append(c);
 		}
+
 		buf.append("-- " + x.cle.toString());
 		if (x.gauche != null || x.droit != null) {
 			buf.append(" --");
