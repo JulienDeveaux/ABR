@@ -182,6 +182,10 @@ public class ABR<E> extends AbstractCollection<E> {
 	private Noeud supprimer(Noeud z) {
 		Noeud y;
 		Noeud x;
+		if(rechercher(z.cle) == null){
+
+            return null;
+        }
 		if (z.gauche == null || z.droit == null){
     		y = z;
 		}
