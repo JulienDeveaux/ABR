@@ -6,47 +6,43 @@ import java.util.*;
  * recherche. Les éléments sont ordonnés soit en utilisant l'ordre naturel (cf
  * Comparable) soit avec un Comparator fourni à la création.
  * </p>
- *
+ * 
  * <p>
  * Certaines méthodes de AbstractCollection doivent être surchargées pour plus
  * d'efficacité.
  * </p>
- *
+ * 
  * @param <E>
  *            le type des clés stockées dans l'arbre
  */
 public class ABR<E> extends AbstractCollection<E> {
 	private Noeud racine;
-	private Noeud sentinelle;
 	private int taille;
 	private Comparator<? super E> cmp;
-	public Noeud noeudNul = new Noeud(null);
 
 	private class Noeud {
 		E cle;
 		Noeud gauche;
 		Noeud droit;
 		Noeud pere;
-		char couleur;
 
 		Noeud(E cle) {
 			this.cle = cle;
 			this.droit = null;
 			this.gauche = null;
 			this.pere = null;
-			couleur = 'R';
 		}
 
 		/**
 		 * Renvoie le noeud contenant la clé minimale du sous-arbre enraciné
 		 * dans ce noeud
-		 *
+		 * 
 		 * @return le noeud contenant la clé minimale du sous-arbre enraciné
 		 *         dans ce noeud
 		 */
 		Noeud minimum() {
 			Noeud x = this;
-			while (x.gauche != sentinelle) {
+			while (x.gauche != null) {
 				x = x.gauche;
 			}
 			return x;
@@ -54,7 +50,7 @@ public class ABR<E> extends AbstractCollection<E> {
 
 		/**
 		 * Renvoie le successeur de ce noeud
-		 *
+		 * 
 		 * @return le noeud contenant la clé qui suit la clé de ce noeud dans
 		 *         l'ordre des clés, null si c'es le noeud contenant la plus
 		 *         grande clé
@@ -72,8 +68,6 @@ public class ABR<E> extends AbstractCollection<E> {
 			return y;
 		}
 
-
-
 		@Override
 		public boolean equals(Object o) {
 			if (this == o) return true;
@@ -84,7 +78,7 @@ public class ABR<E> extends AbstractCollection<E> {
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(cle);
+		return Objects.hash(cle);
 		}
 	}
 
@@ -95,15 +89,14 @@ public class ABR<E> extends AbstractCollection<E> {
 	 */
 	public ABR() {
 		taille = 0;
+		racine = null;
 		cmp = (e1, e2) -> ((Comparable<E>)e1).compareTo(e2);
-		sentinelle =  sentinelle();
-		racine = sentinelle;
 	}
 
 	/**
 	 * Crée un arbre vide. Les éléments sont comparés selon l'ordre imposé par
 	 * le comparateur
-	 *
+	 * 
 	 * @param cmp
 	 *            le comparateur utilisé pour définir l'ordre des éléments
 	 */
@@ -116,7 +109,7 @@ public class ABR<E> extends AbstractCollection<E> {
 	/**
 	 * Constructeur par recopie. Crée un arbre qui contient les mêmes éléments
 	 * que c. L'ordre des éléments est l'ordre naturel.
-	 *
+	 * 
 	 * @param c
 	 *            la collection à copier
 	 */
@@ -149,7 +142,7 @@ public class ABR<E> extends AbstractCollection<E> {
 	@Override
 	public boolean remove(Object o)
 	{
-		return this.supprimer( this.rechercher((E)o)) != sentinelle;
+		return this.supprimer( this.rechercher((E)o)) != null;
 	}
 
 
@@ -158,15 +151,15 @@ public class ABR<E> extends AbstractCollection<E> {
 	/**
 	 * Recherche une clé. Cette méthode peut être utilisée par
 	 * {@link #contains(Object)} et {@link #remove(Object)}
-	 *
+	 * 
 	 * @param o
 	 *            la clé à chercher
 	 * @return le noeud qui contient la clé ou null si la clé n'est pas trouvée.
 	 */
-	private Noeud rechercher(Object o) {
+	public Noeud rechercher(Object o) {
 		Noeud x = racine;
 
-		while (x != sentinelle && cmp.compare(x.cle, (E)o) != 0 ) {
+		while (x != null && x.cle != (E)o) {
 			if (cmp.compare(x.cle, (E)o) > 0) {
 				x = x.gauche;
 			} else {
@@ -179,7 +172,7 @@ public class ABR<E> extends AbstractCollection<E> {
 	/**
 	 * Supprime le noeud z. Cette méthode peut être utilisée dans
 	 * {@link #remove(Object)} et {@link Iterator#remove()}
-	 *
+	 * 
 	 * @param z
 	 *            le noeud à supprimer
 	 * @return le noeud contenant la clé qui suit celle de z dans l'ordre des
@@ -189,66 +182,59 @@ public class ABR<E> extends AbstractCollection<E> {
 	private Noeud supprimer(Noeud z) {
 		Noeud y;
 		Noeud x;
-
-		if (z.gauche == sentinelle || z.droit == sentinelle){
-			y = z;
+		if (z.gauche == null || z.droit == null){
+    		y = z;
 		}
-		else{
+  		else{
 			y = z.suivant();
 		}
-		// y est le nœud à détacher
+  		// y est le nœud à détacher
 
 		if(y == null){
 			return null;
 		}
 
-		if (y.gauche != sentinelle) {
+  		if (y.gauche != null) {
 			x = y.gauche;
 		}
-		else {
+  		else {
 			x = y.droit;
 		}
-		// x est le fils unique de y ou null si y n'a pas de fils
+  		// x est le fils unique de y ou null si y n'a pas de fils
 
-		if (x != sentinelle) {
-			x.pere = y.pere;
-		}
+  		if (x != null) {
+  			x.pere = y.pere;
+  		}
 
-		if (y.pere == null) { // suppression de la racine
-			this.racine = x;
-		} else {
-			if (y.equals(y.pere.gauche)) {
+  		if (y.pere == null) { // suppression de la racine
+  			this.racine = x;
+  		} else {
+    		if (y.equals(y.pere.gauche)) {
 				y.pere.gauche = x;
 			}
-			else {
+    		else {
 				y.pere.droit = x;
 			}
-		}
+  		}
 
-		if (!y.equals(z)) {
-			z.cle = y.cle;
+  		if (!y.equals(z)) {
+  			z.cle = y.cle;
 		}
 		this.taille--;
 		return z.suivant();
 	}
 
-	public Noeud sentinelle(){
-		Noeud s = new Noeud(null);
-		s.pere = s.gauche = s.droit = s;
-		s.couleur = 'N';
-		return s;
-	}
 
 	@Override
 	public boolean add(E e)
 	{
-		if (e == null) return false;
+		if( e == null ) return false;
+
 		Noeud z = new Noeud(e);
-		Noeud y = sentinelle;
+		Noeud y = null;
 		Noeud x = racine;
 
-
-		while (x != sentinelle)
+		while (x != null)
 		{
 			y = x;
 			x = this.cmp.compare(z.cle, x.cle) < 0 ? x.gauche : x.droit;
@@ -256,9 +242,8 @@ public class ABR<E> extends AbstractCollection<E> {
 
 		z.pere = y;
 
-		if( y == sentinelle )
+		if( y == null )
 		{
-			z.couleur = 'N';
 			racine = z;
 		}
 		else
@@ -267,105 +252,9 @@ public class ABR<E> extends AbstractCollection<E> {
 			else                                    y.droit  = z;
 		}
 
-		z.gauche = z.droit = sentinelle;
-		z.couleur = 'R';
-		ajouterCorrection(z);
+		z.gauche = z.droit = null;
 		taille++;
 		return true;
-	}
-
-
-	private void ajouterCorrection(Noeud z) {
-		Noeud y;
-		while (z.pere.couleur == 'R') {
-			// (*) La seule propriété RN violée est (4) : z et z.pere sont rouges
-			if (z.pere == z.pere.pere.gauche) {
-				y = z.pere.pere.droit; // l'oncle de z
-				if (y.couleur == 'R') {
-					// cas 1
-					z.pere.couleur = 'N';
-					y.couleur = 'N';
-					z.pere.pere.couleur = 'R';
-					z = z.pere.pere;
-				} else {
-					if (z == z.pere.droit) {
-						// cas 2
-						z = z.pere;
-						rotationGauche(z);
-					}
-					// cas 3
-					z.pere.couleur = 'N';
-					z.pere.pere.couleur = 'R';
-					rotationDroite(z.pere.pere);
-				}
-			} else {
-				y = z.pere.pere.gauche; // l'oncle de z
-				if (y.couleur == 'R') {
-					// cas 1
-					z.pere.couleur = 'N';
-					y.couleur = 'N';
-					z.pere.pere.couleur = 'R';
-					z = z.pere.pere;
-				} else {
-					if (z == z.pere.droit) {
-						// cas 2
-						z = z.pere;
-						rotationGauche(z);
-					}
-					// cas 3
-					z.pere.couleur = 'N';
-					z.pere.pere.couleur = 'R';
-					rotationDroite(z.pere.pere);
-				}
-
-				// idem en miroir, gauche <-> droite
-				// cas 1', 2', 3'
-			}
-		}
-		// (**) La seule propriété (potentiellement) violée est (2)
-		racine.couleur = 'N';
-	}
-
-	private void rotationGauche(Noeud x) {
-		Noeud y = x.droit;
-		x.droit = y.gauche;
-		if(y.gauche != sentinelle){
-			y.gauche.pere = x;
-		}
-		y.pere = x.pere;
-
-		if(x.pere == sentinelle){
-			this.racine = y;
-		}
-		else if(x == x.pere.gauche){
-			x.pere.gauche = y;
-		}
-		else {
-			x.pere.droit = y;
-		}
-		y.gauche = x;
-		x.pere = y;
-	}
-
-	private  void rotationDroite(Noeud x){
-		Noeud y = x.gauche;
-		System.out.println(y.cle);
-		x.gauche = y.droit;
-		if(y.droit != sentinelle){
-			y.droit.pere = x;
-		}
-		y.pere = x.pere;
-		if (x.pere == sentinelle){
-			this.racine = y;
-		}
-		else if (x == x.pere.gauche){
-			x.pere.gauche = y;
-		}
-		else {
-			x.pere.droit = y;
-		}
-		y.droit = x;
-		x.pere = y;
 	}
 
 	@Override
@@ -386,27 +275,27 @@ public class ABR<E> extends AbstractCollection<E> {
 	private class ABRIterator implements Iterator<E> {
 		Noeud courant;
 
-		ABRIterator(){
+		 ABRIterator(){
 			Noeud courant = racine;
 		}
 
 		public boolean hasNext() {
-			return courant != null;
+		return courant != null;
 		}
 
 		public E next() {
-			E tmp;
-			if (courant == null){
-				return null;
+		 	E tmp;
+		 	if (courant == null){
+		 		return null;
 			}
-			tmp = courant.cle;
+		 	tmp = courant.cle;
 			this.courant.suivant();
 
 			return tmp;
 		}
 
 		public void remove() {
-			this.courant = ABR.this.supprimer(courant);
+		this.courant = ABR.this.supprimer(courant);
 		}
 	}
 
@@ -420,7 +309,7 @@ public class ABR<E> extends AbstractCollection<E> {
 	}
 
 	private void toString(Noeud x, StringBuffer buf, String path, int len) {
-		if (x == sentinelle)
+		if (x == null)
 			return;
 		toString(x.droit, buf, path + "D", len);
 		for (int i = 0; i < path.length(); i++) {
@@ -433,12 +322,9 @@ public class ABR<E> extends AbstractCollection<E> {
 				c = '|';
 			buf.append(c);
 		}
-		if (x.couleur == 'R') {
-			buf.append("-- " + "\u001B[31m" + x.cle.toString() + "\u001B[0m");
-		} else {
-			buf.append("-- " + x.cle.toString());
-		}
-		if (x.gauche != sentinelle || x.droit != sentinelle) {
+
+		buf.append("-- " + x.cle.toString());
+		if (x.gauche != null || x.droit != null) {
 			buf.append(" --");
 			for (int j = x.cle.toString().length(); j < len; j++)
 				buf.append('-');
@@ -449,7 +335,7 @@ public class ABR<E> extends AbstractCollection<E> {
 	}
 
 	private int maxStrLen(Noeud x) {
-		return x == sentinelle ? 0 : Math.max(x.cle.toString().length(),
+		return x == null ? 0 : Math.max(x.cle.toString().length(),
 				Math.max(maxStrLen(x.gauche), maxStrLen(x.droit)));
 	}
 
